@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --font-noto: "Noto Sans JP", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+}
+
+@layer base {
+  html, body {
+    @apply h-full m-0 p-0 overflow-hidden;
+  }
+}
+
+.schedule-paper {
+  font-family: var(--font-noto);
+}
+
+.cell-name {
+  font-family: var(--font-noto);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.circle-num {
+  @apply border border-black rounded-full w-5 h-5 flex items-center justify-center text-xs;
+}
+
+.triangle-marker {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid black;
+}
