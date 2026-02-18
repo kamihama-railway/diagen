@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface Time {
   hour?: string
@@ -7,6 +7,7 @@ interface Time {
 }
 
 interface Station {
+  id: string
   name: string
   hour?: string
   minute?: string
@@ -123,85 +124,191 @@ const StationRow = ({
   )
 }
 
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+}) => {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-[#1f2937] w-full max-w-lg rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+          <h3 className="font-bold text-lg">{title}</h3>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <span className="material-icons-round">close</span>
+          </button>
+        </div>
+        <div className="p-6 max-h-[70vh] overflow-y-auto">{children}</div>
+      </div>
+    </div>
+  )
+}
+
 function App() {
-  const [district, setDistrict] = useState('仮想検証区')
-  const [trainNo, setTrainNo] = useState('V-777X')
-  const [type, setType] = useState('Limited Exp')
-  const [destination, setDestination] = useState('未来都市')
+  // Persistence Keys
+  const STORAGE_KEY_CONFIG = 'diagen_config'
+  const STORAGE_KEY_STATIONS = 'diagen_stations'
 
-  const [stations, setStations] = useState<Station[]>([
-    { name: '起点港', hour: '08', minute: '00', second: '00', track: 'A', major: true },
-    { name: '(信号所α)', minute: '02', second: '15', track: 'B' },
-    { name: '(仮想野)', minute: '05', second: '30', track: 'C' },
-    { name: '(試験原)', minute: '07', second: '45' },
-    { name: '', isEmpty: true },
-    { name: '(デモ崎)', minute: '10', second: '00', track: 'D' },
-    { name: '(開発林)', minute: '12', second: '20' },
-    {
-      name: '検証中央',
-      splitTimes: { arr: { minute: '15', second: '00' }, dep: { minute: '17', second: '00' } },
-      major: true,
-      track: '1',
-      marker: 'triangle',
-    },
-    { name: '(コード谷)', minute: '20', second: '30', track: '2' },
-    { name: '(ビット湖)', minute: '23', second: '45', track: '2' },
-    { name: '(データ森)', minute: '25', second: '10', track: '3' },
-    { name: '(アプリ原)', minute: '28', second: '55', track: '4' },
-    { name: '', isEmpty: true },
-    { name: '(システム海)', minute: '32', second: '10' },
-    {
-      name: 'プロトタウン',
-      splitTimes: { arr: { minute: '35', second: '00' }, dep: { minute: '37', second: '00' } },
-      major: true,
-      track: '5',
-      marker: 'reverse-triangle',
-      note: '×仮想特急 通過',
-    },
-    { name: '(スクリプト川)', minute: '40', second: '20' },
-    { name: '(コンパイル山)', minute: '43', second: '45' },
-    { name: '(リンク村)', minute: '46', second: '15', track: '2' },
-    { name: '(ビルド地)', minute: '49', second: '30', track: '1' },
-    {
-      name: '未来都市',
-      splitTimes: {
-        arr: { hour: '09', minute: '00', second: '00' },
-        dep: { hour: '09', minute: '05', second: '00' },
+  const [district, setDistrict] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_CONFIG + '_district') || '仮想検証区'
+  })
+  const [trainNo, setTrainNo] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_CONFIG + '_trainNo') || 'V-777X'
+  })
+  const [type, setType] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_CONFIG + '_type') || 'Limited Exp'
+  })
+  const [destination, setDestination] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_CONFIG + '_destination') || '未来都市'
+  })
+
+  const [stations, setStations] = useState<Station[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_STATIONS)
+    if (saved) return JSON.parse(saved)
+    return [
+      { id: '1', name: '起点港', hour: '08', minute: '00', second: '00', track: 'A', major: true },
+      { id: '2', name: '(信号所α)', minute: '02', second: '15', track: 'B' },
+      { id: '3', name: '(仮想野)', minute: '05', second: '30', track: 'C' },
+      { id: '4', name: '(試験原)', minute: '07', second: '45' },
+      { id: '5', name: '', isEmpty: true },
+      { id: '6', name: '(デモ崎)', minute: '10', second: '00', track: 'D' },
+      { id: '7', name: '(开发林)', minute: '12', second: '20' },
+      {
+        id: '8',
+        name: '検証中央',
+        splitTimes: { arr: { minute: '15', second: '00' }, dep: { minute: '17', second: '00' } },
+        major: true,
+        track: '1',
+        marker: 'triangle',
       },
-      major: true,
-      track: '9',
-      marker: 'triangle',
-    },
-    { name: '(終点信号)', minute: '07', second: '30', track: 'X' },
-    { name: '(エンド点)', minute: '10', second: '00' },
-    { name: '', isEmpty: true },
-    {
-      name: '試験終了駅',
-      splitTimes: { arr: { minute: '15', second: '20' }, dep: { minute: '16', second: '20' } },
-      major: true,
-      track: '0',
-    },
-    { name: '', isEmpty: true },
-    {
-      name: 'テスト終着',
-      hour: '09',
-      minute: '20',
-      second: '45',
-      track: 'Z',
-      major: true,
-      marker: 'triangle',
-    },
-  ])
+      { id: '9', name: '(コード谷)', minute: '20', second: '30', track: '2' },
+      { id: '10', name: '(ビット湖)', minute: '23', second: '45', track: '2' },
+      { id: '11', name: '(数据森)', minute: '25', second: '10', track: '3' },
+      { id: '12', name: '(应用原)', minute: '28', second: '55', track: '4' },
+      { id: '13', name: '', isEmpty: true },
+      { id: '14', name: '(系统海)', minute: '32', second: '10' },
+      {
+        id: '15',
+        name: 'プロトタウン',
+        splitTimes: { arr: { minute: '35', second: '00' }, dep: { minute: '37', second: '00' } },
+        major: true,
+        track: '5',
+        marker: 'reverse-triangle',
+        note: '×仮想特急 通過',
+      },
+      { id: '16', name: '(スクリプト川)', minute: '40', second: '20' },
+      { id: '17', name: '(コンパイル山)', minute: '43', second: '45' },
+      { id: '18', name: '(リンク村)', minute: '46', second: '15', track: '2' },
+      { id: '19', name: '(ビルド地)', minute: '49', second: '30', track: '1' },
+      {
+        id: '20',
+        name: '未来都市',
+        splitTimes: {
+          arr: { hour: '09', minute: '00', second: '00' },
+          dep: { hour: '09', minute: '05', second: '00' },
+        },
+        major: true,
+        track: '9',
+        marker: 'triangle',
+      },
+      { id: '21', name: '(终点信号)', minute: '07', second: '30', track: 'X' },
+      { id: '22', name: '(エンド点)', minute: '10', second: '00' },
+      { id: '23', name: '', isEmpty: true },
+      {
+        id: '24',
+        name: '試験終了駅',
+        splitTimes: { arr: { minute: '15', second: '20' }, dep: { minute: '16', second: '20' } },
+        major: true,
+        track: '0',
+      },
+      { id: '25', name: '', isEmpty: true },
+      {
+        id: '26',
+        name: 'テスト终着',
+        hour: '09',
+        minute: '20',
+        second: '45',
+        track: 'Z',
+        major: true,
+        marker: 'triangle',
+      },
+    ]
+  })
 
-  const editStation = (index: number) => {
-    const s = stations[index]
-    if (s.isEmpty) return
-    const newName = prompt('Station Name', s.name)
-    if (newName !== null) {
+  // Persistence Effects
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_CONFIG + '_district', district)
+    localStorage.setItem(STORAGE_KEY_CONFIG + '_trainNo', trainNo)
+    localStorage.setItem(STORAGE_KEY_CONFIG + '_type', type)
+    localStorage.setItem(STORAGE_KEY_CONFIG + '_destination', destination)
+  }, [district, trainNo, type, destination])
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_STATIONS, JSON.stringify(stations))
+  }, [stations])
+
+  // Station Editing Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [formData, setFormData] = useState<Partial<Station>>({})
+
+  const openEditModal = (index: number) => {
+    setEditingIndex(index)
+    setFormData({ ...stations[index] })
+    setIsModalOpen(true)
+  }
+
+  const openAddModal = () => {
+    setEditingIndex(null)
+    setFormData({ id: crypto.randomUUID(), name: '', minute: '00', second: '00' })
+    setIsModalOpen(true)
+  }
+
+  const saveStation = () => {
+    if (editingIndex !== null) {
       const newStations = [...stations]
-      newStations[index] = { ...s, name: newName }
+      newStations[editingIndex] = formData as Station
       setStations(newStations)
+    } else {
+      setStations([...stations, formData as Station])
     }
+    setIsModalOpen(false)
+  }
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null)
+
+  const deleteStation = (index: number) => {
+    setDeletingIndex(index)
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (deletingIndex !== null) {
+      const newStations = stations.filter((_, i) => i !== deletingIndex)
+      setStations(newStations)
+      setIsDeleteModalOpen(false)
+      setDeletingIndex(null)
+    }
+  }
+
+  const moveStation = (index: number, direction: 'up' | 'down') => {
+    const newStations = [...stations]
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= stations.length) return
+    ;[newStations[index], newStations[targetIndex]] = [newStations[targetIndex], newStations[index]]
+    setStations(newStations)
   }
 
   return (
@@ -289,47 +396,68 @@ function App() {
 
           <hr className="border-gray-200 dark:border-gray-700" />
 
-          <div>
+          <div className="flex-1 flex flex-col min-h-0">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider">
                 Schedule Entries
               </h2>
-              <button className="text-[#ef4444] hover:text-[#b91c1c] text-xs font-bold flex items-center gap-1">
+              <button
+                onClick={openAddModal}
+                className="text-[#ef4444] hover:text-[#b91c1c] text-xs font-bold flex items-center gap-1"
+              >
                 <span className="material-icons-round text-sm">add</span> Add
               </button>
             </div>
-            <div className="space-y-2">
-              {stations
-                .map((s, originalIndex) => ({ s, originalIndex }))
-                .filter((item) => !item.s.isEmpty)
-                .slice(0, 5)
-                .map(({ s, originalIndex }) => (
+            <div className="space-y-2 overflow-y-auto pr-2">
+              {stations.map((s, i) => (
+                <div
+                  key={s.id || i}
+                  className={`group relative flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 border ${s.isEmpty ? 'border-dashed border-gray-300 dark:border-gray-600 opacity-50' : 'border-transparent hover:border-gray-200 dark:hover:border-gray-700'} transition-all`}
+                >
                   <div
-                    key={originalIndex}
-                    className="group flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all"
-                  >
-                    <div
-                      className={`h-8 w-1 rounded-full ${s.major ? 'bg-[#ef4444]' : 'bg-gray-300 dark:bg-gray-600'}`}
-                    ></div>
-                    <div className="flex-1">
-                      <div className="text-sm font-bold">{s.name}</div>
+                    className={`h-8 w-1 shrink-0 rounded-full ${s.major ? 'bg-[#ef4444]' : 'bg-gray-300 dark:bg-gray-600'}`}
+                  ></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold truncate">
+                      {s.isEmpty ? 'Empty Slot' : s.name}
+                    </div>
+                    {!s.isEmpty && (
                       <div className="text-xs text-gray-500 font-mono">
-                        {s.hour || s.splitTimes?.arr.hour || (originalIndex > 18 ? '09' : '08')}:
-                        {s.minute || s.splitTimes?.arr.minute}:
+                        {s.hour || s.splitTimes?.arr.hour || '--'}:{s.minute || s.splitTimes?.arr.minute}:
                         {s.second || s.splitTimes?.arr.second || '00'}
                       </div>
-                    </div>
+                    )}
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-[#ef4444]"
-                      onClick={() => editStation(originalIndex)}
+                      onClick={() => moveStation(i, 'up')}
+                      disabled={i === 0}
+                      className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    >
+                      <span className="material-icons-round text-sm">arrow_upward</span>
+                    </button>
+                    <button
+                      onClick={() => moveStation(i, 'down')}
+                      disabled={i === stations.length - 1}
+                      className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                    >
+                      <span className="material-icons-round text-sm">arrow_downward</span>
+                    </button>
+                    <button
+                      onClick={() => openEditModal(i)}
+                      className="p-1 text-gray-400 hover:text-[#ef4444]"
                     >
                       <span className="material-icons-round text-sm">edit</span>
                     </button>
+                    <button
+                      onClick={() => deleteStation(i)}
+                      className="p-1 text-gray-400 hover:text-red-600"
+                    >
+                      <span className="material-icons-round text-sm">delete</span>
+                    </button>
                   </div>
-                ))}
-              <div className="text-center text-xs text-gray-400 py-2 italic">
-                And {stations.filter((s) => !s.isEmpty).length - 5} more stations...
-              </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -368,31 +496,288 @@ function App() {
 
               <div className="flex-1 flex overflow-hidden">
                 <div className="flex-1 border-r border-black flex flex-col">
-                  {stations.slice(0, 18).map((s, i) => (
-                    <StationRow key={i} {...s} />
+                  {stations.slice(0, Math.ceil(stations.length / 2)).map((s, i) => (
+                    <StationRow key={s.id || i} {...s} />
                   ))}
                   <div className="flex-1 border-b border-black"></div>
                 </div>
                 <div className="flex-1 flex flex-col">
-                  {stations.slice(18).map((s, i) => (
-                    <StationRow key={i} {...s} />
+                  {stations.slice(Math.ceil(stations.length / 2)).map((s, i) => (
+                    <StationRow key={s.id || i + Math.ceil(stations.length / 2)} {...s} />
                   ))}
                   <div className="flex-1 border-b border-black last:border-b-0"></div>
                 </div>
               </div>
             </div>
-
-            <div className="fixed bottom-6 right-8 flex flex-col gap-3">
-              <button className="bg-white dark:bg-[#1f2937] p-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform">
-                <span className="material-icons-round">add</span>
-              </button>
-              <button className="bg-white dark:bg-[#1f2937] p-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform">
-                <span className="material-icons-round">remove</span>
-              </button>
-            </div>
           </div>
         </section>
       </main>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Deletion"
+      >
+        <div className="space-y-4 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            Are you sure you want to delete this station?
+            {deletingIndex !== null && !stations[deletingIndex].isEmpty && (
+              <span className="block font-bold text-gray-900 dark:text-white mt-1">
+                {stations[deletingIndex].name}
+              </span>
+            )}
+          </p>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={confirmDelete}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingIndex !== null ? 'Edit Station' : 'Add Station'}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 mb-2">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={formData.isEmpty}
+                onChange={(e) => setFormData({ ...formData, isEmpty: e.target.checked })}
+                className="rounded text-[#ef4444] focus:ring-[#ef4444]"
+              />
+              Is Empty Slot
+            </label>
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={formData.major}
+                onChange={(e) => setFormData({ ...formData, major: e.target.checked })}
+                className="rounded text-[#ef4444] focus:ring-[#ef4444]"
+              />
+              Major Station
+            </label>
+          </div>
+
+          {!formData.isEmpty && (
+            <>
+              <div>
+                <label htmlFor="stationName" className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                  Station Name
+                </label>
+                <input
+                  id="stationName"
+                  className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                  type="text"
+                  value={formData.name || ''}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label htmlFor="stationHour" className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Hour
+                  </label>
+                  <input
+                    id="stationHour"
+                    className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                    type="text"
+                    placeholder="e.g. 08"
+                    value={formData.hour || ''}
+                    onChange={(e) => setFormData({ ...formData, hour: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="stationMinute" className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Minute
+                  </label>
+                  <input
+                    id="stationMinute"
+                    className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                    type="text"
+                    value={formData.minute || ''}
+                    onChange={(e) => setFormData({ ...formData, minute: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="stationSecond" className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Second
+                  </label>
+                  <input
+                    id="stationSecond"
+                    className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                    type="text"
+                    value={formData.second || ''}
+                    onChange={(e) => setFormData({ ...formData, second: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Track
+                  </label>
+                  <input
+                    className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                    type="text"
+                    value={formData.track || ''}
+                    onChange={(e) => setFormData({ ...formData, track: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                    Marker
+                  </label>
+                  <select
+                    className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                    value={formData.marker || ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        marker: e.target.value as Station['marker'],
+                      })
+                    }
+                  >
+                    <option value="">None</option>
+                    <option value="triangle">Triangle (Dep)</option>
+                    <option value="reverse-triangle">Rev Triangle (Arr)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Note</label>
+                <input
+                  className="w-full rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-[#ef4444] outline-none"
+                  type="text"
+                  value={formData.note || ''}
+                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                />
+              </div>
+
+              <div className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800/50">
+                <label className="flex items-center gap-2 text-sm font-bold mb-3">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.splitTimes}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({
+                          ...formData,
+                          splitTimes: {
+                            arr: { minute: '00', second: '00' },
+                            dep: { minute: '01', second: '00' },
+                          },
+                        })
+                      } else {
+                        const { splitTimes, ...rest } = formData
+                        setFormData(rest)
+                      }
+                    }}
+                    className="rounded text-[#ef4444] focus:ring-[#ef4444]"
+                  />
+                  Use Split Times (Arr/Dep)
+                </label>
+                {formData.splitTimes && (
+                  <div className="space-y-3 pl-6 border-l-2 border-gray-200 dark:border-gray-700">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-xs font-medium py-2">Arrival</div>
+                      <input
+                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[#ef4444]"
+                        placeholder="M"
+                        value={formData.splitTimes.arr.minute}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            splitTimes: {
+                              ...formData.splitTimes!,
+                              arr: { ...formData.splitTimes!.arr, minute: e.target.value },
+                            },
+                          })
+                        }
+                      />
+                      <input
+                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[#ef4444]"
+                        placeholder="S"
+                        value={formData.splitTimes.arr.second}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            splitTimes: {
+                              ...formData.splitTimes!,
+                              arr: { ...formData.splitTimes!.arr, second: e.target.value },
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-xs font-medium py-2">Departure</div>
+                      <input
+                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[#ef4444]"
+                        placeholder="M"
+                        value={formData.splitTimes.dep.minute}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            splitTimes: {
+                              ...formData.splitTimes!,
+                              dep: { ...formData.splitTimes!.dep, minute: e.target.value },
+                            },
+                          })
+                        }
+                      />
+                      <input
+                        className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[#ef4444]"
+                        placeholder="S"
+                        value={formData.splitTimes.dep.second}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            splitTimes: {
+                              ...formData.splitTimes!,
+                              dep: { ...formData.splitTimes!.dep, second: e.target.value },
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          <div className="pt-4 flex gap-3">
+            <button
+              onClick={saveStation}
+              className="flex-1 bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold py-2 rounded-lg transition-colors"
+            >
+              Save Station
+            </button>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
