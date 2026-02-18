@@ -210,7 +210,7 @@ function App() {
         <div className="flex items-center gap-3">
           <span className="material-icons-round text-[#ef4444] text-3xl">train</span>
           <h1 className="text-xl font-bold tracking-tight">
-            DiaGen <span className="text-xs font-normal opacity-70 ml-1">Enterprise Edition</span>
+            DiaGen <span className="text-xs font-normal opacity-70 ml-1">POC Edition</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
