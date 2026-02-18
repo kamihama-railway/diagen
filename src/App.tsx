@@ -286,10 +286,20 @@ function App() {
     setIsModalOpen(false)
   }
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null)
+
   const deleteStation = (index: number) => {
-    if (confirm('Delete this station?')) {
-      const newStations = stations.filter((_, i) => i !== index)
+    setDeletingIndex(index)
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (deletingIndex !== null) {
+      const newStations = stations.filter((_, i) => i !== deletingIndex)
       setStations(newStations)
+      setIsDeleteModalOpen(false)
+      setDeletingIndex(null)
     }
   }
 
@@ -486,14 +496,14 @@ function App() {
 
               <div className="flex-1 flex overflow-hidden">
                 <div className="flex-1 border-r border-black flex flex-col">
-                  {stations.slice(0, 18).map((s, i) => (
+                  {stations.slice(0, Math.ceil(stations.length / 2)).map((s, i) => (
                     <StationRow key={s.id || i} {...s} />
                   ))}
                   <div className="flex-1 border-b border-black"></div>
                 </div>
                 <div className="flex-1 flex flex-col">
-                  {stations.slice(18).map((s, i) => (
-                    <StationRow key={s.id || i + 18} {...s} />
+                  {stations.slice(Math.ceil(stations.length / 2)).map((s, i) => (
+                    <StationRow key={s.id || i + Math.ceil(stations.length / 2)} {...s} />
                   ))}
                   <div className="flex-1 border-b border-black last:border-b-0"></div>
                 </div>
@@ -502,6 +512,37 @@ function App() {
           </div>
         </section>
       </main>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Deletion"
+      >
+        <div className="space-y-4 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            Are you sure you want to delete this station?
+            {deletingIndex !== null && !stations[deletingIndex].isEmpty && (
+              <span className="block font-bold text-gray-900 dark:text-white mt-1">
+                {stations[deletingIndex].name}
+              </span>
+            )}
+          </p>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={confirmDelete}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={isModalOpen}

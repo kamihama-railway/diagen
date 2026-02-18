@@ -66,9 +66,12 @@ This project is configured for automated deployment to **GitHub Pages**.
 
 1. Go to your repository settings on GitHub.
 2. Navigate to **Pages**.
-3. Under **Build and deployment > Source**, select **GitHub Actions**.
+3. Under **Build and deployment > Source**, select **Deploy from a branch**.
+4. Select the `gh-pages` branch and the `/ (root)` folder.
 
-The workflow in `.github/workflows/deploy.yml` will automatically build and deploy the project whenever you push to the `main` or `master` branch.
+The workflow in `.github/workflows/deploy.yml` supports multi-branch deployment:
+- Pushes to `main` or `master` are deployed to the root.
+- Pushes to other branches are deployed to a subdirectory named after the branch (e.g., `your-url/branch-name/`).
 
 ## 📝 Project Structure
 
@@ -144,6 +147,9 @@ bun run build
 
 1. 进入 GitHub 仓库设置 (Settings)。
 2. 导航至 **Pages**。
-3. 在 **Build and deployment > Source** 下，选择 **GitHub Actions**.
+3. 在 **Build and deployment > Source** 下，选择 **Deploy from a branch**。
+4. 选择 `gh-pages` 分支和 `/ (root)` 文件夹。
 
-一旦推送到 `main` 或 `master` 分支，`.github/workflows/deploy.yml` 中的工作流将自动执行构建 and 部署。
+`.github/workflows/deploy.yml` 中的工作流支持多分支部署：
+- 推送到 `main` 或 `master` 分支将部署到根目录。
+- 推送到其他分支将部署到以分支命名的子目录中（例如：`your-url/branch-name/`）。
