@@ -1,11 +1,11 @@
-# DiaGen - Enterprise Train Schedule Generator (POC)
+# DiaGen - Train Schedule Generator (POC)
 
 [![Build Project](https://github.com/jules/dia-gen/actions/workflows/build.yml/badge.svg)](https://github.com/jules/dia-gen/actions/workflows/build.yml)
 [![Deploy to GitHub Pages](https://github.com/jules/dia-gen/actions/workflows/deploy.yml/badge.svg)](https://github.com/jules/dia-gen/actions/workflows/deploy.yml)
 
 > **⚠️ Disclaimer**: This is a **verification-only project** (验证性项目). All data displayed, including station names, train numbers, and schedules, is **entirely fictional and for demonstration purposes only**.
 
-DiaGen is a modern, enterprise-grade train schedule (Dia) generator dashboard. It allows users to configure train districts, numbers, types, and detailed station schedules with a focus on the strict visual aesthetics of Japanese driver timetables.
+DiaGen is a modern train schedule (Dia) generator dashboard POC. It allows users to configure train districts, numbers, types, and detailed station schedules with a focus on the strict visual aesthetics of Japanese driver timetables.
 
 ## ✨ Features
 
@@ -79,11 +79,11 @@ The workflow in `.github/workflows/deploy.yml` will automatically build and depl
 
 ---
 
-# DiaGen - 企业级列车时刻表生成器 (POC)
+# DiaGen - 列车时刻表生成器 (POC)
 
 > **⚠️ 免责声明**: 本项目纯属 **验证性项目**。其中展示的所有数据（包括但不限于车站名称、列车车次、运行时刻等）均为 **纯编造数据**，仅用于功能演示。
 
-DiaGen 是一款现代、企业级的列车时刻表 (Dia) 生成器仪表盘。它允许用户配置列车运行区段、车次、种别及详细的车站时刻，重点还原日本列车驾驶员时刻表的严格视觉美学。
+DiaGen 是一款现代列车时刻表 (Dia) 生成器仪表盘 POC。它允许用户配置列车运行区段、车次、种别及详细的车站时刻，重点还原日本列车驾驶员时刻表的严格视觉美学。
 
 ## ✨ 功能特性
 
@@ -144,6 +144,6 @@ bun run build
 
 1. 进入 GitHub 仓库设置 (Settings)。
 2. 导航至 **Pages**。
-3. 在 **Build and deployment > Source** 下，选择 **GitHub Actions**。
+3. 在 **Build and deployment > Source** 下，选择 **GitHub Actions**.
 
 一旦推送到 `main` 或 `master` 分支，`.github/workflows/deploy.yml` 中的工作流将自动执行构建 and 部署。
