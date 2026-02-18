@@ -1,73 +1,145 @@
-# React + TypeScript + Vite
+# DiaGen - Enterprise Train Schedule Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Build Project](https://github.com/jules/dia-gen/actions/workflows/build.yml/badge.svg)](https://github.com/jules/dia-gen/actions/workflows/build.yml)
+[![Deploy to GitHub Pages](https://github.com/jules/dia-gen/actions/workflows/deploy.yml/badge.svg)](https://github.com/jules/dia-gen/actions/workflows/deploy.yml)
 
-Currently, two official plugins are available:
+DiaGen is a modern, enterprise-grade train schedule (Dia) generator dashboard. It allows users to configure train districts, numbers, types, and detailed station schedules with a focus on the strict visual aesthetics of Japanese driver timetables.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- **Professional Timetable Layout**: Faithfully reproduces Japanese train schedule aesthetics, including:
+  - Strict black grid borders.
+  - Highlighted major stations.
+  - Split arrival/departure time displays.
+  - Marker support (Triangles, Reverse Triangles).
+  - Track number indicators.
+- **Dynamic Configuration**: Easily update train metadata (District, Number, Type, Destination) and station entries via a functional sidebar.
+- **Modern Tech Stack**: Built with React 19, TypeScript, and Tailwind CSS v4.
+- **High Performance**: Powered by Bun and Vite for lightning-fast development and builds.
+- **CI/CD Ready**: Automated build and deployment workflows via GitHub Actions.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework**: [React 19](https://react.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Build Tool**: [Vite 6+](https://vitejs.dev/)
+- **Runtime**: [Bun](https://bun.sh/)
+- **Compiler**: [tsgo](https://github.com/typescript/native-preview) (via `@typescript/native-preview`)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [Bun](https://bun.sh/) installed on your machine.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/dia-gen.git
+cd dia-gen
+
+# Install dependencies
+bun install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Start the development server
+bun run dev
 ```
+
+### Build
+
+```bash
+# Compile and build for production
+bun run build
+```
+
+## 📦 Deployment
+
+This project is configured for automated deployment to **GitHub Pages**.
+
+1. Go to your repository settings on GitHub.
+2. Navigate to **Pages**.
+3. Under **Build and deployment > Source**, select **GitHub Actions**.
+
+The workflow in `.github/workflows/deploy.yml` will automatically build and deploy the project whenever you push to the `main` or `master` branch.
+
+## 📝 Project Structure
+
+- `src/App.tsx`: Main dashboard and timetable visualization logic.
+- `src/index.css`: Tailwind CSS v4 styling and theme configuration.
+- `.github/workflows/`: CI/CD pipeline definitions.
+- `package.json`: Project dependencies and scripts.
+
+---
+
+# DiaGen - 企业级列车时刻表生成器
+
+DiaGen 是一款现代、企业级的列车时刻表 (Dia) 生成器仪表盘。它允许用户配置列车运行区段、车次、种别及详细的车站时刻，重点还原日本列车驾驶员时刻表的严格视觉美学。
+
+## ✨ 功能特性
+
+- **专业时刻表布局**: 忠实还原日本列车时刻表美学，包括：
+  - 严格的黑色网格边框。
+  - 重点车站高亮。
+  - 到发时间分割显示。
+  - 符号支持（正三角、倒三角）。
+  - 股道编号指示。
+- **动态配置**: 通过功能侧边栏轻松更新列车元数据（运行区段、车次、种别、行先）及车站条目。
+- **现代技术栈**: 基于 React 19, TypeScript 和 Tailwind CSS v4 构建。
+- **高性能**: 由 Bun 和 Vite 提供支持，实现极速开发和构建。
+- **持续集成/部署**: 通过 GitHub Actions 实现自动化构建和部署。
+
+## 🛠 技术栈
+
+- **框架**: [React 19](https://react.dev/)
+- **语言**: [TypeScript](https://www.typescriptlang.org/)
+- **样式**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **构建工具**: [Vite 6+](https://vitejs.dev/)
+- **运行环境**: [Bun](https://bun.sh/)
+- **编译器**: [tsgo](https://github.com/typescript/native-preview) (通过 `@typescript/native-preview`)
+
+## 🚀 快速入门
+
+### 前置条件
+
+- 机器上已安装 [Bun](https://bun.sh/)。
+
+### 安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/yourusername/dia-gen.git
+cd dia-gen
+
+# 安装依赖
+bun install
+```
+
+### 开发环境
+
+```bash
+# 启动开发服务器
+bun run dev
+```
+
+### 构建
+
+```bash
+# 编译并构建生产版本
+bun run build
+```
+
+## 📦 部署
+
+本项目已配置 **GitHub Pages** 自动化部署。
+
+1. 进入 GitHub 仓库设置 (Settings)。
+2. 导航至 **Pages**。
+3. 在 **Build and deployment > Source** 下，选择 **GitHub Actions**。
+
+一旦推送到 `main` 或 `master` 分支，`.github/workflows/deploy.yml` 中的工作流将自动执行构建和部署。
