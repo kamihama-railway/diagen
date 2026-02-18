@@ -1,12 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --font-noto: "Noto Sans JP", sans-serif;
-  --font-mono: "Roboto Mono", monospace;
+  --font-noto: 'Noto Sans JP', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply h-full m-0 p-0 overflow-hidden;
   }
 }
